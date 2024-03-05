@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sagui-config
+  namespace: 4g
+data:
+  config.json: |
+    {
+      "https_port": "8000",
+      "http_port": "4000",
+      "http_run": "yes",
+      "https_run": "yes",
+      "cnc_api_url": "https://192.168.100.12:3000",
+      "license_api_url": "https://127.0.0.1:2030",
+      "nrf": "https://192.168.100.11:9090",
+      "nwdaf": "https://192.168.100.18:8088",
+      "lat": 60.1887843597689,
+      "lon": 24.83342826614908,
+      "menu": {
+        "coreType": "lte",
+        "operator": "enable",
+        "slice_configuration": {
+          "slice_configuration": "enable",
+          "slice_manager": "enable",
+          "roaming_configuration": "enable"
+        },
+
+        "subscriber_management": {
+          "subscriber_management": "enable",
+          "subscription_profile": "enable",
+          "subscribers_group": "enable",
+          "subscribers": "enable"
+        },
+
+        "policy_management": {
+          "policy_management": "enable",
+          "af": "enable",
+          "preemption": "disable"
+        },
+
+        "five_glan": "enable",
+        "nf_configuration": {
+          "nf_configuration": "enable",
+          "upf_configuration": "enable"
+        },
+
+        "monitoring": {
+          "monitoring": "enable",
+          "status": "enable",
+          "qos_monitoring": "disable",
+          "slice_capacity": "disable"
+        }
+      }
+    }

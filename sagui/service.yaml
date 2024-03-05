@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sagui
+  namespace: 4g
+spec:
+  type: LoadBalancer
+  selector:
+    app: sagui
+  ports:
+    - name: http
+      protocol: TCP
+      port: 4000
+      targetPort: 4000
+      nodePort: 30002
+    - name: https
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30003

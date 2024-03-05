@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mme-config
+  namespace: 4g
+data:
+  mme_config.json: |-
+    {
+      "name": "test",
+      "operator_name": "test",
+      "operator_name_short": "test",
+      "s1_addr_ipv4": "172.16.0.222",
+      "s1_addr_ipv6": "::1",
+      "m3_addr_ipv4": "127.0.0.1",
+      "m3_addr_ipv6": "::1",
+      "mme_s11_addr_ipv4": "192.168.100.14",
+      "mme_s11_addr_ipv6": "::2",
+      "sm_addr_ipv4": "127.0.30.1",
+      "mmec": "3",
+      "mmegi": 32772,
+      "mme_capacity": 100,
+      "mcc": 244,
+      "mnc_len": 2,
+      "mnc": 44,
+      "s11u_addr_ipv4": "192.168.100.14",
+      "s10_addr_ipv4": "127.0.0.12",
+      "mysql_host": "localhost",
+      "mysql_db_name": "hss_lte_db",
+      "mysql_user_name": "hss",
+      "mysql_password": "hss",
+      "auth_data_path": "/var/epc/bin/",
+      "auth_srv_ip": "193.167.1.223",
+      "tracking_area_list1": [12452,12594,null,null,null],
+      "tracking_area_list2": [null,null,null,null,null],
+      "tracking_area_list3": [null,null,null,null,null],
+      "periodic_tau_timer": 1,
+      "t_t3450": 2,
+      "t_t3460": 2,
+      "max_retry": 5,
+      "s10_remote_peer": {
+        "s10_mcc": 244,
+        "s10_mnc_len": 2,
+        "s10_mnc": 44,
+        "s10_mmec": 3,
+        "s10_mmegi": 32773,
+        "s10_addr_ipv4": "172.16.0.4"
+      },
+      "nrf_ipV4Address": "192.168.100.11",
+      "nrf_port": "9090",
+      "nrf_nf_instance_id": "713516d0-7c63-466b-9936-59f2b5b3e1d9",
+      "http_server_bind_ipv4": "192.168.100.14",
+      "http_server_bind_port": "9001",
+      "hss_destination_ip_address": "192.168.100.16",
+      "hss_host_ip_address": "192.168.100.16",
+      "licence_server": "192.168.9.195",
+      "licence_server_port": "2030",
+      "token_path": "./",
+      "token_file_name": "mme-token.txt"
+    }

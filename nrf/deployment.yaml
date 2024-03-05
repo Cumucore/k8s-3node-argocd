@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nrf
+  namespace: 4g
+spec:
+  selector:
+    matchLabels:
+      app: nrf
+  template:
+    metadata:
+      labels:
+        app: nrf
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |-
+          [
+            {
+              "name": "macvlan-conf",
+              "interface": "eth1",
+              "ips": ["192.168.100.11"]
+            }
+          ]
+    spec:
+      hostname: nrf
+      imagePullSecrets:
+        - name: nrfcred
+      containers:
+        - name: nrf
+          image: registry.east.lan/nf-projects/nfnrfapi:4.3-latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "500m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 9090
+              protocol: TCP
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - "NET_ADMIN"
+                - "NET_RAW"
+                - "SYS_TIME"
+          volumeMounts:
+            - name: localtime
+              mountPath: /etc/localtime
+            - name: nrf-configuration
+              mountPath: app/nrf-config.yml
+              subPath: nrf-config.yml
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /usr/share/zoneinfo/Europe/Helsinki
+        - name: nrf-configuration
+          configMap:
+            name: nrf-config
+            items:
+              - key: nrf-config.yml
+                path: nrf-config.yml

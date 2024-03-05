@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nrf-config
+  namespace: 4g
+data:
+  nrf-config.yml: |
+    info:
+      description: "Network Repository Function (NRF)"
+      version: "4.3"
+
+    configuration:
+      databaseCredentials:
+        mongodbUrl: "mongodb://mongo-0.mongo:27017,mongo-1.mongo:27017,mongo-2.mongo:27017/nrfdb?replicaSet=rs0"
+        mongodbName: "nrfdb"
+      nnrf:
+        bindingIpv4: "192.168.100.11"
+        port: "9090"
+        nfInstanceName: "NRF"
+        tls:
+          tlsCertFile: "public.crt"
+          tlsKeyFile: "private.key"
+        useFqdn: false
+        plmnIdList:
+          - mcc: "244"
+            mnc: "44"
+      remotePlmnConfig:
+        nrfList:
+          - plmnId: "999-98"
+            ipv4Addr: "127.0.0.5"
+            port: "9091"

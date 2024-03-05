@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: upf
+  namespace: 4g
+  labels:
+    app: upf
+spec:
+  selector:
+    matchLabels:
+      app: upf
+  template:
+    metadata:
+      labels:
+        app: upf
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |-
+          [
+            {
+              "name": "macvlan-conf",
+              "interface": "eth1",
+              "ips": ["192.168.100.17"]
+            },
+            {
+              "name": "n6interface",
+              "interface": "eth2",
+              "ips": ["192.168.9.112/24"],
+              "default-route": ["192.168.9.1"]
+            }
+          ]
+    spec:
+      hostname: upf
+      containers:
+        - name: upf
+          image: registry.east.lan/nf-projects/go-upf:master-latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "500m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8805
+              protocol: UDP
+            - containerPort: 8081
+              protocol: TCP
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - "NET_ADMIN"
+                - "NET_RAW"
+                - "SYS_TIME"
+          volumeMounts:
+            - name: localtime
+              mountPath: /etc/localtime
+            - name: upf-configuration
+              mountPath: app/config.yml
+              subPath: config.yml
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /usr/share/zoneinfo/Europe/Helsinki
+        - name: upf-configuration
+          configMap:
+            name: upf-config
+            items:
+              - key: config.yml
+                path: config.yml

@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: slice-init-config
+  namespace: 4g
+data:
+  init-slice-settings.js: |
+    db = db.getSiblingDB("Slice_settings");
+    db.createUser({
+      user: "Y3VtdWNvcmVucmY=",
+      pwd: "Y3VtdWNvcmVucmY=",
+      roles: [
+        {
+          role: "readWrite",
+          db: "Slice_settings",
+        },
+      ],
+    });
+
+    db = db.getSiblingDB("nrfdb");
+    db.createUser({
+      user: "Y3VtdWNvcmVucmY=",
+      pwd: "Y3VtdWNvcmVucmY=",
+      roles: [
+        {
+          role: "readWrite",
+          db: "nrfdb",
+        },
+      ],
+    });

@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sgw
+  namespace: 4g
+spec:
+  selector:
+    matchLabels:
+      app: sgw
+  template:
+    metadata:
+      labels:
+        app: sgw
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |-
+          [
+            {
+              "name": "macvlan-conf",
+              "interface": "eth1",
+              "ips": ["192.168.100.15"]
+            }
+          ]
+    spec:
+      hostname: sgw
+      containers:
+        - name: sgw
+          image: registry.east.lan/nf-projects/sgw-c:v4.3-latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: 500Mi
+              cpu: 500m
+            limits:
+              memory: 500Mi
+              cpu: 500m
+          ports:
+            - containerPort: 4001
+              protocol: TCP
+            - containerPort: 2123
+              protocol: TCP
+            - containerPort: 2123
+              protocol: UDP
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+                - SYS_TIME
+          volumeMounts:
+            - name: localtime
+              mountPath: /etc/localtime
+            - name: sgw-configuration
+              mountPath: app/sgw_config.json
+              subPath: sgw_config.json
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /usr/share/zoneinfo/Europe/Helsinki
+        - name: sgw-configuration
+          configMap:
+            name: sgw-config
+            items:
+              - key: sgw_config.json
+                path: sgw_config.json

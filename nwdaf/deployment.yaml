@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nwdaf
+  namespace: 4g
+  labels:
+    app: nwdaf
+spec:
+  selector:
+    matchLabels:
+      app: nwdaf
+  template:
+    metadata:
+      labels:
+        app: nwdaf
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |-
+          [
+            {
+              "name": "macvlan-conf",
+              "interface": "eth1",
+              "ips": ["192.168.100.18"]
+            }
+          ]
+    spec:
+      hostname: nwdaf
+      containers:
+        - name: nwdaf
+          image: registry.east.lan/nf-projects/nwdaf:4.3-latest
+          command: ["./nwdaf", "-c", "public/settings.json"]
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "500m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8082
+              protocol: TCP
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - "NET_ADMIN"
+                - "NET_RAW"
+          volumeMounts:
+            - name: localtime
+              mountPath: /etc/localtime
+            - name: nwdaf-configuration
+              mountPath: app/public
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /usr/share/zoneinfo/Europe/Helsinki
+        - name: nwdaf-configuration
+          configMap:
+            name: nwdaf-config
+            items:
+              - key: settings.json
+                path: settings.json

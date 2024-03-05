@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: upf-config
+  namespace: 4g
+data:
+  config.yml: |
+    # go-upf main conf
+    global:
+      logLevel: info
+      skbmode: false
+    networking:
+      HTTP:
+        # Config API settings
+        useAPI: true
+        APIinterface: eth1
+        APIlistenPort: 8081
+        # NRF settings
+        useNRF: true
+        NFName: UPF-1
+        NRFAPIURL: https://192.168.100.11:9090
+      N4:
+        # Listen for control plane messages on interface IP
+        # PFCP port is 8805/udp
+        interface: eth1
+      userplane:
+        # interface names for corresponding networks
+        lan: eth2
+        wan: eth1
+        ran: eth1

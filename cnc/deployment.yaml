@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cnc
+  namespace: 4g
+spec:
+  selector:
+    matchLabels:
+      app: cnc
+  template:
+    metadata:
+      labels:
+        app: cnc
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |-
+          [
+            {
+              "name": "macvlan-conf",
+              "interface": "eth1",
+              "ips": ["192.168.100.12"]
+            }
+          ]
+    spec:
+      hostname: cnc
+      containers:
+        - name: cnc
+          image: registry.east.lan/nf-projects/cnc-api:4.3-latest
+          imagePullPolicy: IfNotPresent
+          command: ["./CNC", "-c", "public/settings.json"]
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "500m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - "NET_ADMIN"
+                - "NET_RAW"
+                - "SYS_TIME"
+          volumeMounts:
+            - name: localtime
+              mountPath: /etc/localtime
+            - name: cnc-configuration
+              mountPath: app/public/settings.json
+              subPath: settings.json
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /usr/share/zoneinfo/Europe/Helsinki
+        - name: cnc-configuration
+          configMap:
+            name: cnc-config
+            items:
+              - key: settings.json
+                path: settings.json

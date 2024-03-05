@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mme
+  namespace: 4g
+spec:
+  selector:
+    matchLabels:
+      app: mme
+  template:
+    metadata:
+      labels:
+        app: mme
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |-
+          [
+            {
+              "name": "macvlan-conf",
+              "interface": "eth1",
+              "ips": ["192.168.100.14"]
+            }
+          ]
+    spec:
+      hostname: mme
+      containers:
+        - name: mme
+          image: registry.east.lan/nf-projects/mme:v4.3-latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "500m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 2123
+              protocol: TCP
+            - containerPort: 36412
+              protocol: TCP
+            - containerPort: 2123
+              protocol: UDP
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - "NET_ADMIN"
+                - "NET_RAW"
+                - "SYS_TIME"
+          volumeMounts:
+            - name: localtime
+              mountPath: /etc/localtime
+            - name: mme-configuration
+              mountPath: app/mme_config.json
+              subPath: mme_config.json
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /usr/share/zoneinfo/Europe/Helsinki
+        - name: mme-configuration
+          configMap:
+            name: mme-config
+            items:
+              - key: mme_config.json
+                path: mme_config.json

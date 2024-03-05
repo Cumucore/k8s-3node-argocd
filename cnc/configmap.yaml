@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cnc-config
+  namespace: 4g
+data:
+  settings.json: |
+    {
+        "host": "192.168.100.12:3000",
+        "cert1": "./Authentication_s/public.crt",
+        "key1": "./Authentication_s/private.key",
+        "cert2": "./Authentication_s/cnc-api-cert.pem",
+        "key2": "./Authentication_s/cnc-api-privkey.pem",
+        "nrf_url": "192.168.100.11:9090",
+        "alarm": "192.168.100.14:9005",
+        "mHost": "mongodb://mongo-0.mongo:27017,mongo-1.mongo:27017,mongo-2.mongo:27017/Slice_settings?replicaSet=rs0",
+        "mDbName": "Slice_settings",
+        "mUser": "Y3VtdWNvcmVucmY=",
+        "mPwd": "Y3VtdWNvcmVucmY=",
+        "plmnList": {
+          "mcc": "244",
+          "mnc": "44"
+        },
+        "statCollection": {
+            "permission": false,
+            "interval": 10
+        },
+        "nfInstanceName": "CUSTOM_CNC-1",
+        "fqdn": "",
+        "ipv4Addresses": [
+            "192.168.100.12"
+        ],
+        "customInfo": {
+            "ipv4Address": "192.168.100.12",
+            "port": "3000"
+        }
+    }

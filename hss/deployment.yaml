@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hss
+  namespace: 4g
+spec:
+  selector:
+    matchLabels:
+      app: hss
+  template:
+    metadata:
+      labels:
+        app: hss
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |-
+          [
+            {
+              "name": "macvlan-conf",
+              "interface": "eth1",
+              "ips": ["192.168.100.16"]
+            }
+          ]
+    spec:
+      hostname: hss
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: hss
+          image: registry.east.lan/nf-projects/hss:4.3-latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "500m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 3868
+              protocol: TCP
+            - containerPort: 20055
+              protocol: TCP
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+                - SYS_TIME
+          volumeMounts:
+            - name: localtime
+              mountPath: /etc/localtime
+            - name: hss-config
+              mountPath: app/hss-config.yml
+              subPath: hss-config.yml
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /usr/share/zoneinfo/Europe/Helsinki
+        - name: hss-config
+          configMap:
+            name: hss-config
+            items:
+              - key: hss-config.yml
+                path: hss-config.yml

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sagui
+  namespace: 4g
+spec:
+  selector:
+    matchLabels:
+      app: sagui
+  template:
+    metadata:
+      labels:
+        app: sagui
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |-
+          [
+            {
+              "name": "macvlan-conf",
+              "interface": "eth1",
+              "ips": ["192.168.100.13"]
+            }
+          ]
+    spec:
+      hostname: sagui
+      containers:
+        - name: sagui
+          image: registry.east.lan/nf-projects/sa_gui_console:4.3-latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: GIN_MODE
+              value: release
+          resources:
+            requests:
+              memory: 500Mi
+              cpu: 500m
+            limits:
+              memory: 500Mi
+              cpu: 500m
+          ports:
+            - containerPort: 4000
+              protocol: TCP
+            - containerPort: 8000
+              protocol: TCP
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+                - SYS_TIME
+          volumeMounts:
+            - name: localtime
+              mountPath: /etc/localtime
+            - name: sagui-configuration
+              mountPath: app/config/config.json
+              subPath: config.json
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /usr/share/zoneinfo/Europe/Helsinki
+        - name: sagui-configuration
+          configMap:
+            name: sagui-config
+            items:
+              - key: config.json
+                path: config.json

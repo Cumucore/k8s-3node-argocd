@@ -1,0 +1,63 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo
+  namespace: 4g
+spec:
+  serviceName: "mongo"
+  replicas: 3
+  selector:
+    matchLabels:
+      role: mongo
+  template:
+    metadata:
+      labels:
+        role: mongo
+        environment: test
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: mongo
+          image: mongo:latest
+          envFrom:
+            - secretRef:
+                name: mongodb-config
+          command:
+            - mongod
+            - "--bind_ip"
+            - "0.0.0.0"
+            - "--replSet"
+            - "rs0"
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - echo "host is $HOSTNAME"
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          volumeMounts:
+            - name: localtime
+              mountPath: /etc/localtime
+            - name: mongo-config
+              mountPath: /docker-entrypoint-initdb.d
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /usr/share/zoneinfo/Europe/Helsinki
+        - name: mongo-config
+          configMap:
+            name: slice-init-config
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-persistent-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
